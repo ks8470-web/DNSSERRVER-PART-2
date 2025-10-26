@@ -144,9 +144,15 @@ def run_dns_server():
                         # answer_data is expected to be a tuple of strings
                         data_items = answer_data if not isinstance(answer_data, str) else (answer_data,)
                         for item in data_items:
-                            # escape existing quotes and wrap in quotes for dns.rdata.from_text
-                            safe = item.replace('"', '\\"')
-                            rdata_list.append(dns.rdata.from_text(dns.rdataclass.IN, dns.rdatatype.TXT, '"' + safe + '"'))
+                            # Create a TXT rdata directly to avoid any parsing/quoting issues
+                            # dns.rdtypes.ANY.TXT.TXT takes (rdclass, rdtype, strings)
+                            try:
+                                rdata_obj = dns.rdtypes.ANY.TXT.TXT(dns.rdataclass.IN, dns.rdatatype.TXT, [item])
+                            except Exception:
+                                # Fallback: use from_text if the direct constructor fails for any dnspython version
+                                safe = item.replace('"', '\\"')
+                                rdata_obj = dns.rdata.from_text(dns.rdataclass.IN, dns.rdatatype.TXT, '"' + safe + '"')
+                            rdata_list.append(rdata_obj)
                     else:
                         if isinstance(answer_data, str):
                             rdata_list = [dns.rdata.from_text(dns.rdataclass.IN, qtype, answer_data)]
