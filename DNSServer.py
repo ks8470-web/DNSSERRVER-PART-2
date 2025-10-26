@@ -50,7 +50,7 @@ input_string = 'AlwaysWatching'
 encrypted_value = encrypt_with_aes(input_string, password, salt) # exfil function
 decrypted_value = decrypt_with_aes(encrypted_value, password, salt)  # exfil function
 
-# Convert encrypted bytes to string for DNS TXT record
+# CRITICAL: Convert encrypted bytes to string for DNS TXT record
 encrypted_token_str = encrypted_value.decode('ascii')
 
 # For future use    
@@ -98,7 +98,7 @@ dns_records = {
         dns.rdatatype.NS: 'ns1.nyu.edu.',
     },
    
-    # Add more records as needed (see assignment instructions!
+    # Add more records as needed (see assignment instructions!)
 }
 
 def run_dns_server():
